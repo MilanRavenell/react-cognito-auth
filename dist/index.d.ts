@@ -1,4 +1,4 @@
-import { AuthData, AuthState, Config } from "./types";
+import { AuthData, AuthState, Config, CognitoAuthError } from "./types";
 interface CognitoAuthParams {
     config: Config;
 }
@@ -13,4 +13,4 @@ export interface CognitoAuth {
     changePassword: (prevPassword: string, newPassword: string, newPasswrdConfirm: string) => Promise<void>;
 }
 export declare const useCognitoAuth: ({ config }: CognitoAuthParams) => CognitoAuth;
-export {};
+export { Config, AuthState, AuthData, CognitoAuthError };
