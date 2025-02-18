@@ -17,7 +17,6 @@ export async function cognitoRefreshToken(
     AuthFlow: AuthFlowType.REFRESH_TOKEN_AUTH,
     ClientId: config.userPoolClientId,
     AuthParameters: {
-      USERNAME: authData.cognitoUser[config.cognitoUsernameField],
       REFRESH_TOKEN: authData.refreshToken,
     },
   });

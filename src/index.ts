@@ -11,7 +11,7 @@ import { cognitoResendConfirmationCode } from "./actions/cognito-resend-confirma
 import { cognitoValidateAccessToken } from "./actions/cognito-validate-access-token";
 import { cognitoRefreshToken } from "./actions/cognito-refresh-token";
 import { cognitoChangePassword } from "./actions/cognito-change-password";
-import { AuthData, AuthState, Config } from "./types";
+import { AuthData, AuthState, Config, CognitoAuthError } from "./types";
 
 interface CognitoAuthParams {
   config: Config;
@@ -68,7 +68,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
           return;
         }
       } catch (err) {
-        console.error("Failed to validate access token", err);
+        throw new CognitoAuthError("Failed to validate access token: "  + err);
       }
 
       setAuthState(AuthState.UNAUTHENTICATED);
@@ -78,12 +78,16 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
   useEffect(() => {
     (async () => {
       if (authData) {
-        if (await cognitoValidateAccessToken(authData.accessToken, config)) {
-          setAuthState(AuthState.AUTHENTICATED);
-          return;
+        try {
+          if (await cognitoValidateAccessToken(authData.accessToken, config)) {
+            setAuthState(AuthState.AUTHENTICATED);
+            return;
+          }
+  
+          setAuthState(AuthState.UNAUTHENTICATED);
+        } catch (err) {
+          throw new CognitoAuthError("Failed to validate access token: " + err);
         }
-
-        setAuthState(AuthState.UNAUTHENTICATED);
       }
     })();
   }, [authData]);
@@ -94,8 +98,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
       await setAuthCookies(authData);
       setAuthData(authData);
     } catch (err) {
-      console.error("Failed to login", err);
-      throw new Error("Failed to login");
+      throw new CognitoAuthError("Failed to login: " + err);
     }
   }, []);
 
@@ -104,8 +107,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
       try {
         await cognitoSignup(user, pass, passConfirm, config);
       } catch (err) {
-        console.error("Failed to sign up", err);
-        throw new Error("Failed to sign up");
+        throw new CognitoAuthError("Failed to sign up: " + err);
       }
     },
     [],
@@ -125,8 +127,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
         }
         setAuthData(authData);
       } catch (err) {
-        console.error("Failed to confirm sign up", err);
-        throw new Error("Failed to confirm sign up");
+        throw new CognitoAuthError("Failed to confirm sign up: " + err);
       }
     },
     [],
@@ -136,8 +137,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
     try {
       await cognitoResendConfirmationCode(user, config);
     } catch (err) {
-      console.error("Failed to resend confirmation code", err);
-      throw new Error("Failed to resend confirmation code");
+      throw new CognitoAuthError("Failed to resend confirmation code: " + err);
     }
   }, []);
 
@@ -149,7 +149,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
     ) => {
       try {
         if (!authData || !authData.accessToken) {
-          throw new Error("No access token");
+          throw new Error("No access token, is user logged in?");
         }
 
         await cognitoChangePassword(
@@ -160,8 +160,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
           config,
         );
       } catch (err) {
-        console.error("Failed to reset password", err);
-        throw new Error("Failed to reset password");
+        throw new CognitoAuthError("Failed to reset password: " + err);
       }
     },
     [authData],

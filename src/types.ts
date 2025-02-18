@@ -20,3 +20,9 @@ export interface Config {
   awsRegion: string;
   cognitoUsernameField: string;
 }
+
+export class CognitoAuthError extends Error {
+  name: string;
+  message: string;
+}
+
