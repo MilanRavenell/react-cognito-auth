@@ -183,3 +183,5 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
     changePassword,
   };
 };
+
+export { Config, AuthState, AuthData, CognitoAuthError };
