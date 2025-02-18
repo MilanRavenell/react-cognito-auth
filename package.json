@@ -8,7 +8,7 @@
     "prettier": "npx prettier . --write",
     "build": "tsc"
   },
-  "author": "milanr",
+  "author": "milan-ravenell",
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.750.0",
