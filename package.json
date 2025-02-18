@@ -1,6 +1,6 @@
 {
   "name": "react-cognito-auth-hook",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Package for handling and managing user authentication in react applications",
   "main": "dist/index.js",
   "scripts": {
