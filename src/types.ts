@@ -18,7 +18,6 @@ export interface Config {
   userPoolClientId: string;
   userPoolId: string;
   awsRegion: string;
-  cognitoUsernameField: string;
 }
 
 export class CognitoAuthError extends Error {
