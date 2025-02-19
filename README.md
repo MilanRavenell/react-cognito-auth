@@ -29,9 +29,10 @@ Before using this package, you need:
 
 1. An AWS account with a configured Cognito User Pool
 2. A Cognito User Pool Client configured with the following:
-   - Enabled `USER_PASSWORD_AUTH` authentication flow
+   - Enabled `USER_PASSWORD_AUTH`, `USER_AUTH` authentication flows
 
 You will need the following information from your AWS Cognito setup:
+
 - User Pool ID
 - User Pool Client ID
 - AWS Region
@@ -44,7 +45,7 @@ First, create a configuration object with your AWS Cognito details:
 const config = {
   region: "YOUR_AWS_REGION",
   userPoolId: "YOUR_USER_POOL_ID",
-  clientId: "YOUR_CLIENT_ID"
+  clientId: "YOUR_CLIENT_ID",
 };
 ```
 
@@ -56,13 +57,13 @@ const config = {
 import { useCognitoAuth } from 'react-cognito-auth-hook';
 
 function App() {
-  const { 
-    authData, 
-    authState, 
-    login, 
-    initSignUp, 
+  const {
+    authData,
+    authState,
+    login,
+    initSignUp,
     confirmSignUp,
-    signOut 
+    signOut
   } = useCognitoAuth({ config });
 
   // Check authentication state
@@ -101,7 +102,7 @@ try {
 try {
   // Initialize sign up
   await initSignUp(username, password, passwordConfirm);
-  
+
   // Confirm sign up with code
   await confirmSignUp(username, confirmationCode);
   // User is now signed up and logged in
@@ -156,6 +157,7 @@ The hook provides the following authentication states:
 ## Security
 
 This package handles authentication tokens securely by:
+
 - Storing tokens in HTTP-only cookies
 - Automatically refreshing tokens
 - Validating tokens before use

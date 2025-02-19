@@ -10,6 +10,7 @@ import { AuthData, Config } from "../types";
 export async function cognitoConfirmSignup(
   user: string,
   code: string,
+  session: string,
   config: Config,
 ): Promise<AuthData> {
   const cognito = new CognitoIdentityProviderClient({
@@ -20,6 +21,7 @@ export async function cognitoConfirmSignup(
     ClientId: config.userPoolClientId,
     Username: user,
     ConfirmationCode: code,
+    Session: session,
   });
 
   const { Session } = await cognito.send(validateEmailCommand);
@@ -28,6 +30,9 @@ export async function cognitoConfirmSignup(
     AuthFlow: AuthFlowType.USER_AUTH,
     ClientId: config.userPoolClientId,
     Session,
+    AuthParameters: {
+      USERNAME: user,
+    },
   });
 
   const initAuthResponse = await cognito.send(initiateAuthCommand);

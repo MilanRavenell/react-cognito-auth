@@ -25,4 +25,3 @@ export class CognitoAuthError extends Error {
   name: string;
   message: string;
 }
-

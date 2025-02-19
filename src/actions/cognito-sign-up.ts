@@ -9,7 +9,7 @@ export async function cognitoSignup(
   pass: string,
   passConfirm: string,
   config: Config,
-): Promise<void> {
+): Promise<string | undefined> {
   if (pass !== passConfirm) {
     throw new Error("Passwords did not match");
   }
@@ -24,5 +24,6 @@ export async function cognitoSignup(
     Password: pass,
   });
 
-  await cognito.send(createUserCommand);
+  const { Session } = await cognito.send(createUserCommand);
+  return Session;
 }

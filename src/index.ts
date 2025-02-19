@@ -8,7 +8,6 @@ import { cognitoLoginUserPasswordAuth } from "./actions/cognito-login-user-passw
 import { cognitoSignup } from "./actions/cognito-sign-up";
 import { cognitoConfirmSignup } from "./actions/cognito-confirm-sign-up";
 import { cognitoResendConfirmationCode } from "./actions/cognito-resend-confirmation-code";
-import { cognitoValidateAccessToken } from "./actions/cognito-validate-access-token";
 import { cognitoRefreshToken } from "./actions/cognito-refresh-token";
 import { cognitoChangePassword } from "./actions/cognito-change-password";
 import { AuthData, AuthState, Config, CognitoAuthError } from "./types";
@@ -43,32 +42,27 @@ export interface CognitoAuth {
 export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
   const [authData, setAuthData] = useState<AuthData | null>(null);
   const [authState, setAuthState] = useState<AuthState>(AuthState.INIT);
+  const [signUpSession, setSignUpSession] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
         let cookieAuthData = await getAuthCookies();
         if (cookieAuthData) {
-          if (
-            !(await cognitoValidateAccessToken(
-              cookieAuthData.accessToken,
-              config,
-            ))
-          ) {
-            const refreshTokens = await cognitoRefreshToken(
-              cookieAuthData,
-              config,
-            );
-            cookieAuthData = {
-              ...cookieAuthData,
-              accessToken: refreshTokens.accessToken,
-            };
-          }
+          const refreshTokens = await cognitoRefreshToken(
+            cookieAuthData,
+            config,
+          );
+          cookieAuthData = {
+            ...cookieAuthData,
+            accessToken: refreshTokens.accessToken,
+          };
+
           setAuthData(cookieAuthData);
-          return;
+          setAuthState(AuthState.AUTHENTICATED);
         }
       } catch (err) {
-        throw new CognitoAuthError("Failed to validate access token: "  + err);
+        throw new CognitoAuthError("Failed to validate access token: " + err);
       }
 
       setAuthState(AuthState.UNAUTHENTICATED);
@@ -76,20 +70,9 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      if (authData) {
-        try {
-          if (await cognitoValidateAccessToken(authData.accessToken, config)) {
-            setAuthState(AuthState.AUTHENTICATED);
-            return;
-          }
-  
-          setAuthState(AuthState.UNAUTHENTICATED);
-        } catch (err) {
-          throw new CognitoAuthError("Failed to validate access token: " + err);
-        }
-      }
-    })();
+    if (authData) {
+      setAuthState(AuthState.AUTHENTICATED);
+    }
   }, [authData]);
 
   const login = useCallback(async (user: string, pass: string) => {
@@ -105,7 +88,10 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
   const initSignUp = useCallback(
     async (user: string, pass: string, passConfirm: string) => {
       try {
-        await cognitoSignup(user, pass, passConfirm, config);
+        const session = await cognitoSignup(user, pass, passConfirm, config);
+        if (session) {
+          setSignUpSession(session);
+        }
       } catch (err) {
         throw new CognitoAuthError("Failed to sign up: " + err);
       }
@@ -120,7 +106,16 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
       callback?: (authData: AuthData) => Promise<void>,
     ) => {
       try {
-        const authData = await cognitoConfirmSignup(user, code, config);
+        if (!signUpSession) {
+          throw new Error("User has not started sign up");
+        }
+
+        const authData = await cognitoConfirmSignup(
+          user,
+          code,
+          signUpSession,
+          config,
+        );
         await setAuthCookies(authData);
         if (callback) {
           await callback(authData);
@@ -130,7 +125,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
         throw new CognitoAuthError("Failed to confirm sign up: " + err);
       }
     },
-    [],
+    [signUpSession],
   );
 
   const resendConfirmationCode = useCallback(async (user: string) => {
