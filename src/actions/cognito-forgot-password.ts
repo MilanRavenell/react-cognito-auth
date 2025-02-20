@@ -49,10 +49,8 @@ export async function cognitoConfirmForgotPassword(
       ConfirmationCode: confirmationCode,
     });
 
-    console.log("confirmForgotPasswordCommand", confirmForgotPasswordCommand);
     await cognito.send(confirmForgotPasswordCommand);
   } catch (error) {
-    console.log("error", error);
     const authError = new CognitoAuthError();
     authError.name = "ConfirmForgotPasswordError";
     authError.message =
