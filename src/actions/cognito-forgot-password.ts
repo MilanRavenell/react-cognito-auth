@@ -7,7 +7,7 @@ import { Config, CognitoAuthError } from "../types";
 
 export async function cognitoInitForgotPassword(
   username: string,
-  config: Config
+  config: Config,
 ): Promise<void> {
   const cognito = new CognitoIdentityProviderClient({
     region: config.awsRegion,
@@ -23,7 +23,10 @@ export async function cognitoInitForgotPassword(
   } catch (error) {
     const authError = new CognitoAuthError();
     authError.name = "ForgotPasswordError";
-    authError.message = error instanceof Error ? error.message : "Failed to initiate password reset";
+    authError.message =
+      error instanceof Error
+        ? error.message
+        : "Failed to initiate password reset";
     throw authError;
   }
 }
@@ -32,7 +35,7 @@ export async function cognitoConfirmForgotPassword(
   username: string,
   newPassword: string,
   confirmationCode: string,
-  config: Config
+  config: Config,
 ): Promise<void> {
   const cognito = new CognitoIdentityProviderClient({
     region: config.awsRegion,
@@ -52,7 +55,10 @@ export async function cognitoConfirmForgotPassword(
     console.log("error", error);
     const authError = new CognitoAuthError();
     authError.name = "ConfirmForgotPasswordError";
-    authError.message = error instanceof Error ? error.message : "Failed to confirm password reset";
+    authError.message =
+      error instanceof Error
+        ? error.message
+        : "Failed to confirm password reset";
     throw authError;
   }
-} 
+}

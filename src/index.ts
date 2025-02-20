@@ -5,15 +5,18 @@ import {
   setAuthCookies,
 } from "./actions/cookies";
 import { cognitoLoginUserPasswordAuth } from "./actions/cognito-login-user-password-auth";
-import { cognitoInitSignup, cognitoConfirmSignup } from "./actions/cognito-sign-up";
+import {
+  cognitoInitSignup,
+  cognitoConfirmSignup,
+} from "./actions/cognito-sign-up";
 import { cognitoResendConfirmationCode } from "./actions/cognito-resend-confirmation-code";
 import { cognitoRefreshToken } from "./actions/cognito-refresh-token";
 import { cognitoChangePassword } from "./actions/cognito-change-password";
 import { AuthData, AuthState, Config, CognitoAuthError } from "./types";
-import { 
+import {
   cognitoInitForgotPassword,
-  cognitoConfirmForgotPassword 
-} from './actions/cognito-forgot-password';
+  cognitoConfirmForgotPassword,
+} from "./actions/cognito-forgot-password";
 
 interface CognitoAuthParams {
   config: Config;
@@ -41,7 +44,11 @@ export interface CognitoAuth {
     newPasswrdConfirm: string,
   ) => Promise<void>;
   initForgotPassword: (username: string) => Promise<void>;
-  confirmForgotPassword: (username: string, newPassword: string, confirmationCode: string) => Promise<void>;
+  confirmForgotPassword: (
+    username: string,
+    newPassword: string,
+    confirmationCode: string,
+  ) => Promise<void>;
 }
 
 export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
@@ -90,19 +97,16 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
     }
   }, []);
 
-  const initSignUp = useCallback(
-    async (user: string, pass: string) => {
-      try {
-        const session = await cognitoInitSignup(user, pass, config);
-        if (session) {
-          setSignUpSession(session);
-        }
-      } catch (err) {
-        throw new CognitoAuthError("Failed to sign up: " + err);
+  const initSignUp = useCallback(async (user: string, pass: string) => {
+    try {
+      const session = await cognitoInitSignup(user, pass, config);
+      if (session) {
+        setSignUpSession(session);
       }
-    },
-    [],
-  );
+    } catch (err) {
+      throw new CognitoAuthError("Failed to sign up: " + err);
+    }
+  }, []);
 
   const confirmSignUp = useCallback(
     async (
@@ -142,10 +146,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
   }, []);
 
   const changePassword = useCallback(
-    async (
-      prevPassword: string,
-      newPassword: string,
-    ) => {
+    async (prevPassword: string, newPassword: string) => {
       try {
         if (!authData || !authData.accessToken) {
           throw new Error("No access token, is user logged in?");
@@ -178,7 +179,7 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
         throw error;
       }
     },
-    [config]
+    [config],
   );
 
   const confirmForgotPassword = useCallback(
@@ -188,13 +189,13 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
           username,
           newPassword,
           confirmationCode,
-          config
+          config,
         );
       } catch (error) {
         throw error;
       }
     },
-    [config]
+    [config],
   );
 
   return {
