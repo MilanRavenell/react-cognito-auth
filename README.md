@@ -101,7 +101,7 @@ try {
 ```typescript
 try {
   // Initialize sign up
-  await initSignUp(username, password, passwordConfirm);
+  await initSignUp(username, password);
 
   // Confirm sign up with code
   await confirmSignUp(username, confirmationCode);
@@ -115,7 +115,7 @@ try {
 
 ```typescript
 try {
-  await changePassword(currentPassword, newPassword, newPasswordConfirm);
+  await changePassword(currentPassword, newPassword);
   // Password successfully changed
 } catch (error) {
   // Handle password change error

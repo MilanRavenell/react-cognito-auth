@@ -145,7 +145,6 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
     async (
       prevPassword: string,
       newPassword: string,
-      newPasswrdConfirm: string,
     ) => {
       try {
         if (!authData || !authData.accessToken) {
@@ -156,7 +155,6 @@ export const useCognitoAuth = ({ config }: CognitoAuthParams): CognitoAuth => {
           authData?.accessToken,
           prevPassword,
           newPassword,
-          newPasswrdConfirm,
           config,
         );
       } catch (err) {
