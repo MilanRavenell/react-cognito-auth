@@ -1,12 +1,13 @@
 {
   "name": "react-cognito-auth-hook",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "Package for handling and managing user authentication in react applications",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prettier": "npx prettier . --write",
-    "build": "tsc"
+    "build": "tsc",
+    "publish": "npm run build && npm publish"
   },
   "author": "milan-ravenell",
   "license": "MIT",

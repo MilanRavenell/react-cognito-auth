@@ -11,6 +11,8 @@ export interface CognitoAuth {
     resendConfirmationCode: (user: string) => Promise<void>;
     signOut: () => Promise<void>;
     changePassword: (prevPassword: string, newPassword: string, newPasswrdConfirm: string) => Promise<void>;
+    initForgotPassword: (username: string) => Promise<void>;
+    confirmForgotPassword: (username: string, newPassword: string, confirmationCode: string) => Promise<void>;
 }
 export declare const useCognitoAuth: ({ config }: CognitoAuthParams) => CognitoAuth;
 export { Config, AuthState, AuthData, CognitoAuthError };

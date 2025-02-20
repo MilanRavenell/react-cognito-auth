@@ -133,6 +133,22 @@ try {
 }
 ```
 
+### Forgot Password
+
+```typescript
+try {
+  // Initialize forgot password flow
+  await initForgotPassword(username);
+  // This will trigger Cognito to send a confirmation code
+
+  // Confirm new password with code
+  await confirmForgotPassword(username, newPassword, confirmationCode);
+  // Password has been reset successfully
+} catch (error) {
+  // Handle forgot password error
+}
+```
+
 ## Auth States
 
 The hook provides the following authentication states:
@@ -153,6 +169,8 @@ The hook provides the following authentication states:
 - `resendConfirmationCode(username: string)`: Resend verification code
 - `signOut()`: Sign out the current user
 - `changePassword(prevPassword: string, newPassword: string, newPasswordConfirm: string)`: Change user's password
+- `initForgotPassword(username: string)`: Start the forgot password process
+- `confirmForgotPassword(username: string, newPassword: string, code: string)`: Confirm new password with verification code
 
 ## Security
 
